@@ -1,0 +1,81 @@
+###########################################################################################
+
+# CPU max: 1.5
+# RAM max: 350MB
+
+###########################################################################################
+
+networks:
+    balancer-net:
+    data-transfer:
+#    payment-processor:
+#        external: true
+
+###########################################################################################
+
+version: "3.1"
+
+services:
+    load-balancer:
+        image: nginx:1.27.5-alpine3.21-slim
+        hostname: "rb-2025_load-balancer"
+        volumes: # ro = Read Only
+            - ./volumes/nginx:/etc/nginx/templates:ro
+        depends_on:
+            - app-0
+            - app-1
+        networks:
+            - balancer-net
+        ports:
+            - "9999:9999"
+        deploy:
+            resources:
+                limits:
+                    cpus: "0.25"
+                    memory: "30MB"
+        environment:
+            - NGINX_PORT=9999
+            - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+
+    cache-db:
+        image: valkey/valkey:8.0.4-alpine3.22
+        hostname: "rb-2025_cache-db"
+        ports:
+            - "6379:6379"
+        networks:
+            - data-transfer
+        deploy:
+            resources:
+                limits:
+                    cpus: "0.25"
+                    memory: "60MB"
+
+    app-0: &app
+        image: debian:buster-20240612-slim
+        build: .
+        depends_on:
+            - cache-db
+        networks:
+            - balancer-net
+            - data-transfer
+        deploy:
+            resources:
+                limits:
+                    cpus: "0.5"
+                    memory: "130MB"
+        hostname: "rb-2025_app-0"
+        ports:
+            - "8080:8080"
+        environment:
+            - PORT=8080
+
+    app-1:
+        <<: *app
+        hostname: "rb-2025_app-1"
+        ports:
+            - "8081:8081"
+        environment:
+            - PORT=8081
+
+
+###########################################################################################
