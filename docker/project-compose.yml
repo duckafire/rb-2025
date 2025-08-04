@@ -5,6 +5,23 @@
 
 ###########################################################################################
 
+x-images-templates:
+    app: &app-template
+        image: debian:buster-20240612-slim
+        build: .
+        depends_on:
+            - cache-db
+        networks:
+            - balancer-net
+            - data-transfer
+        deploy:
+            resources:
+                limits:
+                    cpus: "0.5"
+                    memory: "130MB"
+
+###########################################################################################
+
 networks:
     balancer-net:
     data-transfer:
@@ -19,6 +36,7 @@ services:
     load-balancer:
         image: nginx:1.27.5-alpine3.21-slim
         hostname: "rb-2025_load-balancer"
+        container_name: "rb2025-ld" # load balancer
         volumes: # ro = Read Only
             - ./volumes/nginx:/etc/nginx/templates:ro
         depends_on:
@@ -40,6 +58,7 @@ services:
     cache-db:
         image: valkey/valkey:8.0.4-alpine3.22
         hostname: "rb-2025_cache-db"
+        container_name: "rb2025-ca" # cache aside
         ports:
             - "6379:6379"
         networks:
@@ -50,28 +69,19 @@ services:
                     cpus: "0.25"
                     memory: "60MB"
 
-    app-0: &app
-        image: debian:buster-20240612-slim
-        build: .
-        depends_on:
-            - cache-db
-        networks:
-            - balancer-net
-            - data-transfer
-        deploy:
-            resources:
-                limits:
-                    cpus: "0.5"
-                    memory: "130MB"
+    app-0:
+        << *app-template
         hostname: "rb-2025_app-0"
+        container_name: "rb2025-a0" # application 0
         ports:
             - "8080:8080"
         environment:
             - PORT=8080
 
     app-1:
-        <<: *app
+        <<: *app-template
         hostname: "rb-2025_app-1"
+        container_name: "rb2025-a1" # application 1
         ports:
             - "8081:8081"
         environment:
