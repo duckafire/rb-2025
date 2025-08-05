@@ -51,8 +51,8 @@ RUN cd ./libvalkey/build                       \
 
 ############################################################################################
 
-COPY ../src ./src/
-COPY ./Makefile .
+COPY ./src ./src/
+COPY ./docker/Makefile .
 RUN echo "Compiling the main application" \
 	&& make
 
@@ -80,7 +80,7 @@ COPY --from=build /usr/local/lib/libvalkey.so   /usr/local/lib
 COPY --from=build /usr/local/include/crow.h     /usr/local/include
 COPY --from=build /build/bin/rb-2025            .
 COPY --from=build /build/scripts/wait-for-it.sh .
-COPY ./start-server .
+COPY ./docker/start-server .
 
 CMD ["./start-server"]
 

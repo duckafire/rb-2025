@@ -5,10 +5,12 @@
 
 ###########################################################################################
 
+version: "3.6"
+
 x-images-templates:
     app: &app-template
         image: debian:buster-20240612-slim
-        build: .
+        build: ..
         depends_on:
             - cache-db
         networks:
@@ -29,8 +31,6 @@ networks:
 #        external: true
 
 ###########################################################################################
-
-version: "3.1"
 
 services:
     load-balancer:
@@ -70,7 +70,7 @@ services:
                     memory: "60MB"
 
     app-0:
-        << *app-template
+        <<: *app-template
         hostname: "rb-2025_app-0"
         container_name: "rb2025-a0" # application 0
         ports:
