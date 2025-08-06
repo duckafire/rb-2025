@@ -1,0 +1,152 @@
+#!/usr/bin/bash
+
+###########################################################################################
+
+set -Cuo pipefail
+
+declare -r DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+declare -r PROJ_YML="project-compose.yml"
+declare -r PAYM_YML="payment-compose.yml"
+
+declare docker_compose="docker"
+
+###########################################################################################
+
+incmd(){ # INcrement CoMmanD
+	docker_compose="$docker_compose""$1"
+}
+
+does_command_exist(){
+	if type "$1" &> /dev/null; then
+		return 0 # true
+	fi
+
+	return 1 # false
+}
+
+###########################################################################################
+
+warn(){
+	echo "[dc: WARN]: $1."
+}
+
+error(){
+	echo "[dc: ERROR]: $1."
+	echo ""
+	exit 1
+}
+
+###########################################################################################
+
+if [[ $# -eq 0 ]]; then
+	declare -r LF='\n'
+
+	echo -e \
+		'dc [<proj | pay> <up | down> [flags]]'                            $LF\
+		'    It automatize and facilitate the manipulation of'             $LF\
+		'    the Docker Compose files, present in './docker/'.'            $LF\
+		' '                                                                $LF\
+		'proj  Run containers present in `project-compose.yml`.'           $LF\
+		'pay   Run containers present in `payment-compose.yml`.'           $LF\
+		' '                                                                $LF\
+		'up    Run a one-off command.'                                     $LF\
+		'down  Stop and remove containers, networks, images, and volumes.' $LF\
+		' '                                                                $LF\
+		'-b    Build the Docker image of this project.'                    $LF\
+		'-d    Run container in background and print container ID.'        $LF
+
+	exit 0
+fi
+
+###########################################################################################
+
+if [[ $# -eq 1 ]]; then
+	error "Execution command not specified: 'up'; 'down';"
+fi
+
+declare -r FILE_TAG="$1"
+declare -r EXEC_CMD="$2"
+
+###########################################################################################
+
+if does_command_exist "docker-compose"; then
+	incmd "-" # v1
+else
+	incmd " " # v2
+fi
+
+if ! does_command_exist "docker"; then
+	error "Docker (compose) not found"
+fi
+
+incmd "compose --file $DIR/docker/"
+
+###########################################################################################
+
+case "$FILE_TAG" in
+	"proj")
+		incmd "$PROJ_YML"
+		;;
+	"pay")
+		incmd "$PAYM_YML"
+		;;
+	*)
+		error "Invalid YAML file tag: '$FILE_TAG'"
+		;;
+esac
+
+case "$EXEC_CMD" in
+	"up"|"down")
+		incmd " $EXEC_CMD " # space as prefix/suffix (expect +args)
+		;;
+	*)
+		error "Invalid execution command: '$EXEC_CMD'"
+		;;
+esac
+
+###########################################################################################
+
+is_a_valid_flag(){ # INCREMENT FLAGS HERE!
+	case "$1" in # space as suffix
+		"-b") incmd "--build "  ;;
+		"-d") incmd "--detach " ;;
+		*)    error "Invalid flag: '$1'" ;;
+	esac
+}
+
+is_duplicated_flag(){
+	for flag in ${@}; do
+		if [[ "$arg" = "$flag" ]]; then
+			error "Duplicated flag: '$arg'"
+		fi
+	done
+}
+
+validate_flags(){
+	local -a used_flags=()
+
+	for arg in ${@}; do
+		is_a_valid_flag "$arg"
+		is_duplicated_flag ${used_flags[@]}
+
+		# insert into
+		used_flags+=("$arg")
+	done
+}
+
+if [[ $# -gt 2 ]]; then
+	if [[ "$EXEC_CMD" =~ "down" ]]; then
+		warn "Some arguments were ignored"
+	else
+		validate_flags ${@:3}
+	fi
+fi
+
+###########################################################################################
+
+# withou quotes to read its content
+# as separated strings and not as one
+eval $docker_compose
+exit 0
+
+###########################################################################################
