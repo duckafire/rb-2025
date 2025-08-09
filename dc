@@ -158,7 +158,7 @@ fi
 
 inspect_net(){
 	for net in ${@}; do
-		docker network inspect "$net" &> /dev/null
+		docker network inspect "rb-2025_$net" &> /dev/null
 
 		if [[ $? -eq $TRUE ]]; then
 			return $TRUE
@@ -169,7 +169,7 @@ inspect_net(){
 }
 
 manage_payment_net(){
-	declare cmd="docker network $1 payment-processor"
+	declare cmd="docker network $1 rb-2025_payment-processor"
 
 	if [[ "$1" = "create" ]]; then
 		cmd="$cmd --driver bridge"

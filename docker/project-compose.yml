@@ -14,6 +14,7 @@ x-images-templates:
         depends_on:
             - cache-db
         networks:
+            - rb-2025_payment-processor
             - balancer-net
             - data-transfer
         deploy:
@@ -26,12 +27,12 @@ x-images-templates:
 
 networks:
     balancer-net:
-        name: balancer-net
+        name: rb-2025_balancer-net
         driver: bridge
     data-transfer:
-        name: data-transfer
+        name: rb-2025_data-transfer
         driver: bridge
-    payment-processor:
+    rb-2025_payment-processor:
         external: true
 
 ###########################################################################################
