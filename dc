@@ -2,7 +2,15 @@
 
 ###########################################################################################
 
+# NOTE:
+# The network "payment-processor" is created by this script.
+
+###########################################################################################
+
 set -Cuo pipefail
+
+declare -ri TRUE=0
+declare -ri FALSE=1
 
 declare -r DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 declare -r PROJ_YML="project-compose.yml"
@@ -18,10 +26,10 @@ incmd(){ # INcrement CoMmanD
 
 does_command_exist(){
 	if type "$1" &> /dev/null; then
-		return 0 # true
+		return $TRUE
 	fi
 
-	return 1 # false
+	return $FALSE
 }
 
 ###########################################################################################
@@ -79,7 +87,11 @@ if ! does_command_exist "docker"; then
 	error "Docker (compose) not found"
 fi
 
-incmd "compose --file $DIR/docker/"
+incmd "compose"
+declare -r DOCKER_COMPOSE_CMD="$docker_compose"
+
+# space as prefix
+incmd " --file $DIR/docker/"
 
 ###########################################################################################
 
@@ -144,9 +156,47 @@ fi
 
 ###########################################################################################
 
-# withou quotes to read its content
-# as separated strings and not as one
-eval $docker_compose
+inspect_net(){
+	for net in ${@}; do
+		docker network inspect "$net" &> /dev/null
+
+		if [[ $? -eq $TRUE ]]; then
+			return $TRUE
+		fi
+	done
+
+	return $FALSE
+}
+
+manage_payment_net(){
+	declare cmd="docker network $1 payment-processor"
+
+	if [[ "$1" = "create" ]]; then
+		cmd="$cmd --driver bridge"
+	fi
+
+	eval "$cmd"
+}
+
+up_payment_net(){
+	if [[ "$EXEC_CMD" = "up" ]] && ! inspect_net "payment-processor"; then
+		manage_payment_net "create"
+	fi
+}
+
+down_payment_net(){
+	# these networks are from specific compose files, so if
+	# their respective file was not runned, it is not on
+	if [[ "$EXEC_CMD" = "down" ]] && ! inspect_net "payment-processor-db balancer-net"; then
+		manage_payment_net "rm"
+	fi
+}
+
+###########################################################################################
+
+up_payment_net
+eval "$docker_compose"
+down_payment_net
 exit 0
 
 ###########################################################################################

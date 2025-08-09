@@ -26,9 +26,13 @@ x-images-templates:
 
 networks:
     balancer-net:
+        name: balancer-net
+        driver: bridge
     data-transfer:
-#    payment-processor:
-#        external: true
+        name: data-transfer
+        driver: bridge
+    payment-processor:
+        external: true
 
 ###########################################################################################
 
