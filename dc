@@ -169,13 +169,28 @@ inspect_net(){
 }
 
 manage_payment_net(){
+	# \e[N...
+	# 31 red   | 91 red bold
+	# 32 green | 92 green bold
+
+	# ...;Nm
+	# 0 normal
+	# 1 bold
+
 	declare cmd="docker network $1 rb-2025_payment-processor"
+
+	declare action='\e[91;1mRemoving'
+	declare hashcolor='\e[31m'
 
 	if [[ "$1" = "create" ]]; then
 		cmd="$cmd --driver bridge"
+
+		action='\e[92;1mCreating'
+		hashcolor='\e[32m'
 	fi
 
-	eval "$cmd"
+	echo -e "$action 'rb-2025_payment-processor' (network):"'\e[0m'"$hashcolor"
+	echo -e "$(eval "$cmd")"'\e[0m'
 }
 
 up_payment_net(){
