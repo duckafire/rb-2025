@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# check connection availability of
+# the cache data bank (timeout in seconds)
+/app/wait-for-it.sh "cache-aside:6379" --strict --timeout=255
+
+# it ensure that all dependences
+# (shared libraries) are loaded
+ldconfig
+
+# start the main program
+# ($1 = name of the executable)
+/app/run ${@}
+
+echo "Exit code: $?"
