@@ -1,22 +1,19 @@
-PROGRAM_NAME=rb-2025
-COMPILER=g++
+# generic script
+LIBS_DEP?=
+SRC_FILES?=
+COMPILER?=gcc
+FILES_EXT?=.c
 
+PROGRAM_NAME=run
 BIN_DIR=/build/bin
-SRC_DIR=./src/
+SRC_DIR=/build/src
+INC_DIR=/build/include
 
-LIB_DEPENDENCES=pthread valkey
-LIB_DEPENDENCES:=$(addprefix -l, ${LIB_DEPENDENCES})
+LIBS_DEP_FORMATED:=$(foreach libfile, ${LIBS_DEP}, -l${libfile})
 
-FILES_EXT=.cpp
-SRC_FILES=main
-SRC_FILES:=$(addprefix ${SRC_DIR},   ${SRC_FILES})
-SRC_FILES:=$(addsuffix ${FILES_EXT}, ${SRC_FILES})
-
-# call `make FLAGS=-g` to allow
-# the GDB debug mode;
-FLAGS?=
-#FLAGS:=${FLAGS}
+SRC_FILES_FORMATED:=$(foreach file, ${SRC_FILES}, ${SRC_DIR}/${file})
+SRC_FILES_FORMATED:=$(addsuffix ${FILES_EXT}, ${SRC_FILES_FORMATED})
 
 all:
-	mkdir ${BIN_DIR}
-	@${COMPILER} ${SRC_FILES} -o ${BIN_DIR}/${PROGRAM_NAME} ${FLAGS} ${LIB_DEPENDENCES}
+	@mkdir ${BIN_DIR}
+	${COMPILER} ${SRC_FILES_FORMATED} -o ${BIN_DIR}/${PROGRAM_NAME} ${LIBS_DEP_FORMATED} -I ${INC_DIR}
