@@ -7,8 +7,6 @@
 #include "cache.h"
 #include "response.h"
 
-#include <stdio.h> // XXX
-
 #define HASHKEY argv[1]
 #define URL     argv[2]
 
@@ -47,9 +45,6 @@ int main(int argc, char *argv[]){
 			response->failing,
 			response->minResponseTime
 		);
-
-		puts("OK");
-		fflush(stdout); // XXX
 
 		sleep(5);
 	}
