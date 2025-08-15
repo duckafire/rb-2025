@@ -1,13 +1,30 @@
+###########################################################################################
 # Original file:
 # https://github.com/zanfranceschi/rinha-de-backend-2025/blob/main/payment-processor/docker-compose.yml
 
 version: "3.6"
 
+###########################################################################################
+
+networks:
+    payment-processor:
+        name: rb-2025_payment-processor
+        driver: bridge
+    payment-processor-db:
+        name: rb-2025_payment-processor-db
+        driver: bridge
+
+volumes:
+    postgres-socket-01:
+    postgres-socket-02:
+
+###########################################################################################
+
 x-service-templates:
     payment-processor: &payment-processor
         image: zanfranceschi/payment-processor:amd64-20250728111932
         networks:
-            - rb-2025_payment-processor
+            - payment-processor
             - payment-processor-db
         deploy:
             restart_policy:
@@ -40,6 +57,8 @@ x-service-templates:
                     cpus: "1.5"
                     memory: "250MB"
 
+###########################################################################################
+
 services:
     payment-processor-1:
         <<: *payment-processor
@@ -56,14 +75,6 @@ services:
             - postgres-socket-01:/var/run/postgresql
         depends_on:
             - payment-processor-db-1
-
-    payment-processor-db-1:
-        <<: *payment-processor-db
-        container_name: payment-processor-default-db
-        hostname: payment-processor-default-db
-        volumes:
-            - ./volumes/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-            - postgres-socket-01:/var/run/postgresql
 
     payment-processor-2:
         <<: *payment-processor
@@ -86,16 +97,15 @@ services:
         container_name: payment-processor-fallback-db
         hostname: payment-processor-fallback-db
         volumes:
-            - ./volumes/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+            - ../volumes/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres-socket-02:/var/run/postgresql
 
-networks:
-    rb-2025_payment-processor:
-        external: true
-    payment-processor-db:
-        name: rb-2025_payment-processor-db
-        driver: bridge
+    payment-processor-db-1:
+        <<: *payment-processor-db
+        container_name: payment-processor-default-db
+        hostname: payment-processor-default-db
+        volumes:
+            - ../volumes/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+            - postgres-socket-01:/var/run/postgresql
 
-volumes:
-    postgres-socket-01:
-    postgres-socket-02:
+###########################################################################################

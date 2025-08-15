@@ -1,23 +1,6 @@
 ###########################################################################################
 
-# CPU max: 1.5
-# RAM max: 350MB
-
 version: "3.6"
-
-###########################################################################################
-
-x-images-templates:
-    health-checker: &health-checker-template
-        image: debian:buster-20240612-slim
-        build:
-            context: ../..
-            dockerfile: ./docker/build-files/health-checker-c.Dockerfile
-        depends_on:
-            - cache-aside
-        networks:
-            - rb-2025_payment-processor
-            - cache-net
 
 ###########################################################################################
 
@@ -30,11 +13,25 @@ networks:
 
 ###########################################################################################
 
+x-images-templates:
+    health-checker: &health-checker-template
+        image: debian:buster-20240612-slim
+        build:
+            context: ../..
+            dockerfile: ./docker/build-files/health-checker.Dockerfile
+        depends_on:
+            - cache-aside
+        networks:
+            - rb-2025_payment-processor
+            - cache-net
+
+###########################################################################################
+
 services:
     cache-aside:
         image: valkey/valkey:8.0.4-alpine3.22
         hostname: "rb-2025_cache-aside"
-        container_name: "rb2025-cache-aside" # cache aside
+        container_name: "rb-2025_cache-aside"
         ports:
             - "6379:6379"
         networks:
@@ -43,7 +40,7 @@ services:
     health-checker-default:
         <<: *health-checker-template
         hostname: "rb-2025_health-checker-default"
-        container_name: "rb2025-health-checker-default"
+        container_name: "rb-2025_health-checker-default"
         command: /app/boot paym-def http://payment-processor-default:8080/payments/service-health
         ports:
             - "9000:8080"
@@ -51,7 +48,7 @@ services:
     health-checker-fallback:
         <<: *health-checker-template
         hostname: "rb-2025_health-checker-fallback"
-        container_name: "rb2025-health-checker-fallback"
+        container_name: "rb-2025_health-checker-fallback"
         command: /app/boot paym-fal http://payment-processor-fallback:8080/payments/service-health
         ports:
             - "9001:8080"
