@@ -1,217 +1,217 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 ###########################################################################################
 
-# NOTE:
-# The network "payment-processor" is created by this script.
+if [[ $# -eq 0 ]]
+then
+	declare -r LF='\n'
+	declare -r TB='  '
+
+	echo -e \
+'dc up   [-b] [-d]  : docker compose up [--build] [-d|--detach]'$LF\
+'dc down            : docker compose down'$LF\
+'dc logs [layer-id] : docker compose logs --follow' $LF
+
+	exit 0
+fi
+
+declare -r CMD="$1"
 
 ###########################################################################################
 
 set -Cuo pipefail
 
-declare -ri TRUE=0
-declare -ri FALSE=1
-
+declare -ri TOTAL_SCRIPT_ARGS=$#
 declare -r DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-declare -r PROJ_YML="project-compose.yml"
-declare -r PAYM_YML="payment-compose.yml"
+declare -r COMPOSE_DIR="$DIR/docker/compose-files"
+declare -ra COMPOSE_FILES=("payment-processors" "auxiliary-applications")
 
-declare docker_compose="docker"
+# this will be used to store the path
+# of the required compose-file
+declare file_yml=""
 
-###########################################################################################
-
-incmd(){ # INcrement CoMmanD
-	docker_compose="$docker_compose""$1"
-}
-
-does_command_exist(){
-	if type "$1" &> /dev/null; then
-		return $TRUE
-	fi
-
-	return $FALSE
+set_file_yml()
+{
+	file_yml="-f $COMPOSE_DIR/$1-${COMPOSE_FILES[$1]}.yml"
 }
 
 ###########################################################################################
 
-warn(){
-	echo "[dc: WARN]: $1."
-}
-
-error(){
+fatal_error()
+{
 	echo "[dc: ERROR]: $1."
-	echo ""
 	exit 1
 }
 
+warning()
+{
+	echo "[dc: WARNING]: $1."
+}
+
+any_ignored()
+{
+	if [[ $TOTAL_SCRIPT_ARGS -gt $1 ]]
+	then
+		warning "Any arguments were ignored"
+	fi
+}
+
+run(){
+	#echo "$docker_compose $file_yml ${@}"
+	eval "$docker_compose $file_yml ${@}"
+}
+
 ###########################################################################################
 
-if [[ $# -eq 0 ]]; then
-	declare -r LF='\n'
+declare docker_compose="docker"
 
-	echo -e \
-		'dc [<proj | pay> <up | down> [flags]]'                            $LF\
-		'    It automatize and facilitate the manipulation of'             $LF\
-		'    the Docker Compose files, present in './docker/'.'            $LF\
-		' '                                                                $LF\
-		'proj  Run containers present in `project-compose.yml`.'           $LF\
-		'pay   Run containers present in `payment-compose.yml`.'           $LF\
-		' '                                                                $LF\
-		'up    Run a one-off command.'                                     $LF\
-		'down  Stop and remove containers, networks, images, and volumes.' $LF\
-		' '                                                                $LF\
-		'-b    Build the Docker image of this project.'                    $LF\
-		'-d    Run container in background and print container ID.'        $LF
+if type "docker-compose" &> /dev/null
+then
+	docker_compose="$docker_compose-"
+elif type "docker" &> /dev/null
+then
+	docker_compose="$docker_compose "
+else
+	fatal_error "Docker Compose not found"
+fi
 
+docker_compose="${docker_compose}compose"
+
+###########################################################################################
+
+declare -ra NETWORKS=("payment-processor" "cache-net")
+declare -ri MAX_LAYER_LEVEL=${#NETWORKS[@]}-1
+
+check_docker_net()
+{
+	return "$(
+		docker network inspect "rb-2025_$1" &> /dev/null
+		echo "$?"
+	)"
+}
+
+get_layer_level()
+{
+	for (( level = $MAX_LAYER_LEVEL; level > -1; level-- ))
+	do
+		if check_docker_net "${NETWORKS[$level]}"
+		then
+			echo $level
+			return
+		fi
+	done
+
+	echo -1
+}
+
+declare -ri CURRENT_LAYER_LEVEL=$(get_layer_level)
+
+###########################################################################################
+
+if [[ "$CMD" = "logs" ]]
+then
+	if [[ $TOTAL_SCRIPT_ARGS -eq 1 ]]
+	then
+		fatal_error "Layer level not specified"
+	fi
+
+	declare -r STR_LOG_LAYER_LEVEL="$2"
+	declare -r POSSIBLE_LAYERS_ON='^[0-1]$'
+
+	if [[ ! "$STR_LOG_LAYER_LEVEL" =~ $POSSIBLE_LAYERS_ON ]]
+	then
+		fatal_error "Invalid layer level ($STR_LOG_LAYER_LEVEL)"
+	fi
+
+	declare -ri LOG_LAYER_LEVEL="$STR_LOG_LAYER_LEVEL"
+
+	if [[ $LOG_LAYER_LEVEL -gt $CURRENT_LAYER_LEVEL ]]
+	then
+		fatal_error "Unavailable layer level"
+	fi
+
+	any_ignored 2
+	set_file_yml $LOG_LAYER_LEVEL
+
+	run "logs --follow"
 	exit 0
 fi
 
 ###########################################################################################
 
-if [[ $# -eq 1 ]]; then
-	error "Execution command not specified: 'up'; 'down';"
+if [[ "$CMD" != "up" ]] && [[ "$CMD" != "down" ]]
+then
+	fatal_error "Invalid sub-command ($CMD)"
 fi
-
-declare -r FILE_TAG="$1"
-declare -r EXEC_CMD="$2"
 
 ###########################################################################################
 
-if does_command_exist "docker-compose"; then
-	incmd "-" # v1
-else
-	incmd " " # v2
+if [[ "$CMD" = "down" ]]
+then
+	if [[ $CURRENT_LAYER_LEVEL -eq -1 ]]
+	then
+		fatal_error "None layer level is available"
+	fi
+
+	any_ignored 1
+	set_file_yml $CURRENT_LAYER_LEVEL
+	run "down"
+	exit 0
 fi
-
-if ! does_command_exist "docker"; then
-	error "Docker (compose) not found"
-fi
-
-incmd "compose"
-declare -r DOCKER_COMPOSE_CMD="$docker_compose"
-
-# space as prefix
-incmd " --file $DIR/docker/"
 
 ###########################################################################################
 
-case "$FILE_TAG" in
-	"proj")
-		incmd "$PROJ_YML"
-		;;
-	"pay")
-		incmd "$PAYM_YML"
-		;;
-	*)
-		error "Invalid YAML file tag: '$FILE_TAG'"
-		;;
-esac
+if [[ $CURRENT_LAYER_LEVEL -eq $MAX_LAYER_LEVEL ]]
+then
+	fatal_error "All layers label are up"
+fi
 
-case "$EXEC_CMD" in
-	"up"|"down")
-		incmd " $EXEC_CMD " # space as prefix/suffix (expect +args)
-		;;
-	*)
-		error "Invalid execution command: '$EXEC_CMD'"
-		;;
-esac
+declare -ri TRUE=0
+declare -ri FALSE=1
 
-###########################################################################################
+declare -i FLAG_BUILD=$FALSE
+declare -i FLAG_DETACH=$FALSE
 
-is_a_valid_flag(){ # INCREMENT FLAGS HERE!
-	case "$1" in # space as suffix
-		"-b") incmd "--build "  ;;
-		"-d") incmd "--detach " ;;
-		*)    error "Invalid flag: '$1'" ;;
-	esac
+declare docker_compose_flags=""
+
+inc_flags()
+{
+	docker_compose_flags="$docker_compose_flags $1"
 }
 
-is_duplicated_flag(){
-	for flag in ${@}; do
-		if [[ "$arg" = "$flag" ]]; then
-			error "Duplicated flag: '$arg'"
-		fi
+is_duplicated_flag()
+{
+	if [[ $1 -eq $TRUE ]]
+	then
+		fatal_error "Flag ($2) already used"
+	fi
+}
+
+if [[ $TOTAL_SCRIPT_ARGS -gt 1 ]]
+then
+	for flag in ${@:2}
+	do
+		case "$flag" in
+			"-b")
+				is_duplicated_flag $FLAG_BUILD "$flag"
+				FLAG_BUILD=$TRUE
+				inc_flags "--build"
+				;;
+			"-d")
+				is_duplicated_flag $FLAG_DETACH "$flag"
+				FLAG_DETACH=$TRUE
+				inc_flags "--detach"
+				;;
+			*)
+				fatal_error "Invalid flag ($flag)"
+				;;
+		esac
 	done
-}
-
-validate_flags(){
-	local -a used_flags=()
-
-	for arg in ${@}; do
-		is_a_valid_flag "$arg"
-		is_duplicated_flag ${used_flags[@]}
-
-		# insert into
-		used_flags+=("$arg")
-	done
-}
-
-if [[ $# -gt 2 ]]; then
-	if [[ "$EXEC_CMD" =~ "down" ]]; then
-		warn "Some arguments were ignored"
-	else
-		validate_flags ${@:3}
-	fi
 fi
 
-###########################################################################################
-
-inspect_net(){
-	for net in ${@}; do
-		docker network inspect "rb-2025_$net" &> /dev/null
-
-		if [[ $? -eq $TRUE ]]; then
-			return $TRUE
-		fi
-	done
-
-	return $FALSE
-}
-
-manage_payment_net(){
-	# \e[N...
-	# 31 red   | 91 red bold
-	# 32 green | 92 green bold
-
-	# ...;Nm
-	# 0 normal
-	# 1 bold
-
-	declare cmd="docker network $1 rb-2025_payment-processor"
-
-	declare action='\e[91;1mRemoving'
-	declare hashcolor='\e[31m'
-
-	if [[ "$1" = "create" ]]; then
-		cmd="$cmd --driver bridge"
-
-		action='\e[92;1mCreating'
-		hashcolor='\e[32m'
-	fi
-
-	echo -e "$action 'rb-2025_payment-processor' (network):"'\e[0m'"$hashcolor"
-	echo -e "$(eval "$cmd")"'\e[0m'
-}
-
-up_payment_net(){
-	if [[ "$EXEC_CMD" = "up" ]] && ! inspect_net "payment-processor"; then
-		manage_payment_net "create"
-	fi
-}
-
-down_payment_net(){
-	# these networks are from specific compose files, so if
-	# their respective file was not runned, it is not on
-	if [[ "$EXEC_CMD" = "down" ]] && ! inspect_net "payment-processor-db balancer-net"; then
-		manage_payment_net "rm"
-	fi
-}
-
-###########################################################################################
-
-up_payment_net
-eval "$docker_compose"
-down_payment_net
+# now $CMD only can be "up"
+set_file_yml $(( $CURRENT_LAYER_LEVEL + 1 ))
+run "up $docker_compose_flags"
 exit 0
 
 ###########################################################################################
