@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include <signal.h>
 #include "exit-codes.h"
 #include "checker.h"
 #include "cache.h"
@@ -16,10 +15,6 @@ void cleanup(void){
 	free_response();
 }
 
-void sigterm_handler(int code){
-	exit(EXIT_OK);
-}
-
 int main(int argc, char *argv[]){
 	switch(argc){
 		case 1: return EXIT_AUX_HASHEY_NOT_SPECIFIED;
@@ -27,7 +22,6 @@ int main(int argc, char *argv[]){
 	}
 
 	atexit(cleanup);
-	signal(SIGTERM, sigterm_handler);
 
 	connect_cache(HASHKEY);
 	start_checker(URL);
