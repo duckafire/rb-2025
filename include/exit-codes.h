@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum {
 	EXIT_OK,
 	EXIT_AUX_HASHEY_NOT_SPECIFIED,
@@ -8,3 +12,7 @@ enum {
 	EXIT_IMPOSSIBLE_START_CURL,
 	EXIT_SOME_CURL_ERROR,
 };
+
+#ifdef __cplusplus
+}
+#endif
