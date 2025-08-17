@@ -19,7 +19,7 @@ void update_cache(const char *hashkey, bool failing, int minResponseTime){
 
 	// If the payment processor failing after `failing`
 	// to be defined as `false` (0), the "main program"
-	// will define `fall-after-check` as `true` (1).
+	// will define `failing-after-checking` as `true` (1).
 	// It will continue `true` until that this "auxiliar
 	// program" run again.
 	// The "main program" will check these two hash-keys
@@ -28,7 +28,7 @@ void update_cache(const char *hashkey, bool failing, int minResponseTime){
 	// endpoint ("/payment/service-health") delay.
 	reply = valkeyCommand(
 		ctx,
-		"HSET %s fall-after-check %hi failing %hi minResponseTime %i",
+		"HSET %s failing-after-checking %hi failing %hi minResponseTime %i",
 		hashkey,
 		0,
 		failing,
