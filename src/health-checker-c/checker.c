@@ -11,10 +11,11 @@ struct curl_slist *header = NULL;
 
 static void init(void){
 	ctx = curl_easy_init();
-	header = curl_slist_append(NULL, "Content-Type: application/json; charset=ascii");
 
 	if(ctx == NULL)
 		exit(EXIT_IMPOSSIBLE_START_CURL);
+
+	header = curl_slist_append(NULL, "Accept: application/json; charset=ascii");
 }
 
 static size_t writefunction(char *data, size_t size, size_t dataSize, void *buf){
@@ -29,12 +30,12 @@ static size_t writefunction(char *data, size_t size, size_t dataSize, void *buf)
 
 static void setopt(const char *url){
 	// GET by default
-	curl_easy_setopt(ctx, CURLOPT_URL,               url);
-	curl_easy_setopt(ctx, CURLOPT_PORT,             "8080");
-	curl_easy_setopt(ctx, CURLOPT_DEFAULT_PROTOCOL, "http");
-	curl_easy_setopt(ctx, CURLOPT_WRITEFUNCTION,     writefunction);
-	curl_easy_setopt(ctx, CURLOPT_WRITEDATA,         NULL);
-	curl_easy_setopt(ctx, CURLOPT_HTTPGET,           1L);
+	curl_easy_setopt(ctx, CURLOPT_URL,            url);
+	curl_easy_setopt(ctx, CURLOPT_PORT,          "8080");
+	curl_easy_setopt(ctx, CURLOPT_WRITEFUNCTION,  writefunction);
+	curl_easy_setopt(ctx, CURLOPT_WRITEDATA,      NULL);
+	curl_easy_setopt(ctx, CURLOPT_HTTPGET,        1L);
+	curl_easy_setopt(ctx, CURLOPT_HTTPHEADER,     header);
 
 	// it is a bad idea in real world projects
 	curl_easy_setopt(ctx, CURLOPT_SSL_VERIFYHOST, 0L); // +speed?
@@ -55,6 +56,7 @@ void start_checker(const char *url){
 }
 
 char* check_payment_health(const char *url){
+	// response is defined in the `writefunction`
 	if(curl_easy_perform(ctx) != CURLE_OK)
 		exit(EXIT_SOME_CURL_ERROR);
 
