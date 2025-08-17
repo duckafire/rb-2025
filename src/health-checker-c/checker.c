@@ -38,8 +38,9 @@ static void setopt(const char *url){
 	curl_easy_setopt(ctx, CURLOPT_HTTPHEADER,     header);
 
 	// it is a bad idea in real world projects
-	curl_easy_setopt(ctx, CURLOPT_SSL_VERIFYHOST, 0L); // +speed?
-	curl_easy_setopt(ctx, CURLOPT_SSL_VERIFYPEER, 0L);
+	curl_easy_setopt(ctx, CURLOPT_SSL_VERIFYHOST,   0L); // +speed?
+	curl_easy_setopt(ctx, CURLOPT_SSL_VERIFYPEER,   0L);
+	curl_easy_setopt(ctx, CURLOPT_SSL_VERIFYSTATUS, 0L);
 }
 
 static void free_json_response(void){
