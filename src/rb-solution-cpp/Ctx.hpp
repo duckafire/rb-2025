@@ -6,7 +6,8 @@
 #define PAYM_PORT "8080"
 #define HEADER_DATA_POST "Content-Type: application/json; charset=ascii"
 
-class Ctx {
+class Ctx
+{
 private:
 	static CURL *_curl_post = NULL;
 	static struct curl_slist *header_post = NULL;

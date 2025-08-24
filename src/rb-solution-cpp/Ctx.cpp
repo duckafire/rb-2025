@@ -4,7 +4,8 @@
 #include "Ctx.hpp"
 #include "db-info.h"
 
-static void Ctx::set_curl_post(void){
+static void Ctx::set_curl_post(void)
+{
 	this->_curl_post = curl_easy_init();
 
 	if(this->_curl_post == NULL)
@@ -23,7 +24,8 @@ static void Ctx::set_curl_post(void){
 	curl_easy_setopt(this->_curl_post, CURLOPT_SSL_VERIFYSTATUS, 0L);
 }
 
-static void Ctx::set_valkey(void){
+static void Ctx::set_valkey(void)
+{
 	this->_valkey = valkeyConnect(CACHE_DB_HOST, CACHE_DB_PORT);
 
 	// if only the second is `true`,
@@ -33,14 +35,16 @@ static void Ctx::set_valkey(void){
 }
 
 
-static void Ctx::start(void){
+static void Ctx::start(void)
+{
 	std::atexit(Ctx::cleanup);
 
 	this->set_curl_post();
 	this->set_valkey();
 }
 
-static void cleanup(void){
+static void cleanup(void)
+{
 	if(this->_curl_post != NULL)
 		curl_easy_cleanup(this->_curl_post);
 
@@ -52,10 +56,12 @@ static void cleanup(void){
 }
 
 
-static CURL* curl_post(void) const{
+static CURL* curl_post(void) const
+{
 	return this->_curl_post;
 }
 
-static valkeyContext* valkey(void) const{
+static valkeyContext* valkey(void) const
+{
 	return this->_valkey;
 }

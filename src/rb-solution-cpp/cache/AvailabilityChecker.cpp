@@ -3,18 +3,21 @@
 #include "PaymentStatus.hpp"
 #include "../Ctx.hpp"
 
-AvailabilityChecker::AvailabilityChecker(void){
+AvailabilityChecker::AvailabilityChecker(void)
+{
 	this->context = Ctx::valkey();
 	this->paymDef = new PaymentStatus("paym-def");
 	this->paymFal = new PaymentStatus("paym-fal");
 }
 
-AvailabilityChecker::~AvailabilityChecker(void){
+AvailabilityChecker::~AvailabilityChecker(void)
+{
 	delete this->paymDef;
 	delete this->paymFal;
 }
 
-char* get_best_payment_server(void) const{
+char* get_best_payment_server(void) const
+{
 	int paymDefDelay = -1;
 	int paymFalDelay = -1;
 

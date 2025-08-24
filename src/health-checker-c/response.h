@@ -2,7 +2,8 @@
 
 #include <stdbool.h>
 
-typedef struct {
+typedef struct
+{
 	bool failing;
 	int minResponseTime;
 } ResponseJSON;

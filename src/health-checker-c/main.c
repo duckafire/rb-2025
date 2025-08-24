@@ -9,14 +9,17 @@
 #define HASHKEY argv[1]
 #define URL     argv[2]
 
-void cleanup(void){
+void cleanup(void)
+{
 	free_checker();
 	free_cache_connection();
 	free_response();
 }
 
-int main(int argc, char *argv[]){
-	switch(argc){
+int main(int argc, char *argv[])
+{
+	switch(argc)
+	{
 		case 1: return EXIT_AUX_HASHEY_NOT_SPECIFIED;
 		case 2: return EXIT_AUX_URL_NOT_SPECIFIED;
 	}
@@ -28,7 +31,8 @@ int main(int argc, char *argv[]){
 
 	ResponseJSON *response;
 
-	while(true){
+	while(true)
+	{
 		// string to ReponseJSON
 		response = extract_json_data(
 			// get json as a string

@@ -1,7 +1,8 @@
 #include <crow.h>
 #include "Controllers.hpp"
 
-static void Controllers::payments(void) const {
+static void Controllers::payments(void) const
+{
 	crow::json::wvalue res({
 		{"message", "Mr. Stomach is not in home."}
 	});

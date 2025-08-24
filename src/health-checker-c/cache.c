@@ -7,14 +7,16 @@
 
 static valkeyContext *ctx = NULL;
 
-static void check_connection_error(void){
+static void check_connection_error(void)
+{
 	if(ctx != NULL && ctx->err == 0)
 		return;
 
 	exit(EXIT_DB_CONNECT_FAIL);
 }
 
-void update_cache(const char *hashkey, bool failing, int minResponseTime){
+void update_cache(const char *hashkey, bool failing, int minResponseTime)
+{
 	valkeyReply *reply;
 
 	// If the payment processor failing after `failing`
@@ -39,13 +41,15 @@ void update_cache(const char *hashkey, bool failing, int minResponseTime){
 		freeReplyObject(reply);
 }
 
-void connect_cache(const char *hashkey){
+void connect_cache(const char *hashkey)
+{
 	ctx = valkeyConnect(CACHE_DB_HOST, CACHE_DB_PORT);
 	check_connection_error();
 	update_cache(hashkey, false, 0); // avoid "nil"
 }
 
-void free_cache_connection(void){
+void free_cache_connection(void)
+{
 	if(ctx != NULL)
 		valkeyFree(ctx);
 }

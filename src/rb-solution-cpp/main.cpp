@@ -5,7 +5,8 @@
 
 #define PORT argv[1]
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
 	if(argc == 1)
 		return EXIT_NO_PORT_FOR_CPP_SOLUTION;
 

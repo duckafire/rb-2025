@@ -4,7 +4,8 @@
 
 #define MAX_FAILING_KEYS 2
 
-class PaymentStatus {
+class PaymentStatus
+{
 private:
 	valkeyContext *context;
 	const char *hashkey;
@@ -16,7 +17,7 @@ private:
 	};
 
 public:
-	PaymentStatus(const char*);
+	PaymentStatus(const char *hk);
 
 	bool is_available(void) const;
 	int get_min_response_time(void) const;
