@@ -13,7 +13,7 @@ static void Ctx::set_curl_post(void)
 
 	this->header_post = curl_slist_append(NULL, HEADER_DATA_POST);
 
-	curl_easy_setopt(this->_curl_post, CURLOPT_URL,        url);
+	this->cur_url = PAYM_URL::NONE:
 	curl_easy_setopt(this->_curl_post, CURLOPT_PORT,       PAYM_POST);
 	curl_easy_setopt(this->_curl_post, CURLOPT_POST,       1L);
 	curl_easy_setopt(this->_curl_post, CURLOPT_HTTPHEADER, this->header_post);
@@ -64,4 +64,17 @@ static CURL* Ctx::curl_post(void) const
 static valkeyContext* valkey(void) const
 {
 	return this->_valkey;
+}
+
+
+static void Ctx::set_url_to_curl(PAYM_URL url)
+{
+	if(this->cur_url == url)
+		return;
+
+	this->cur_url = url;
+
+	curl_easy_setopt(this->_curl_post, CURLOPT_URL,
+		(url == PAYM_URL::DEFAULT) ? PAYM_DEF_URL : PAYM_FAL_URL
+	);
 }
