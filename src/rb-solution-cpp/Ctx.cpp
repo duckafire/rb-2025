@@ -43,7 +43,7 @@ static void Ctx::start(void)
 	this->set_valkey();
 }
 
-static void cleanup(void)
+static void Ctx::cleanup(void)
 {
 	if(this->_curl_post != NULL)
 		curl_easy_cleanup(this->_curl_post);
@@ -56,7 +56,7 @@ static void cleanup(void)
 }
 
 
-static CURL* curl_post(void) const
+static CURL* Ctx::curl_post(void) const
 {
 	return this->_curl_post;
 }
