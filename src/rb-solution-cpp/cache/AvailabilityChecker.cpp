@@ -14,7 +14,7 @@ AvailabilityChecker::~AvailabilityChecker(void){
 	delete this->paymFal;
 }
 
-char* get_best_payment_server(void){
+char* get_best_payment_server(void) const{
 	int paymDefDelay = -1;
 	int paymFalDelay = -1;
 

@@ -15,8 +15,7 @@ private:
 
 public:
 	AvailabilityChecker(void);
-
 	~AvailabilityChecker(void);
 
-	char* get_best_payment_server(void);
+	char* get_best_payment_server(void) const;
 };

@@ -18,6 +18,6 @@ private:
 public:
 	PaymentStatus(const char*);
 
-	bool is_available(void);
-	int get_min_response_time(void);
+	bool is_available(void) const;
+	int get_min_response_time(void) const;
 };

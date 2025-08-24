@@ -7,7 +7,7 @@ PaymentStatus::PaymentStatus(const char *hk):
 	this->context = Ctx::valkey;
 }
 
-bool PaymentStatus::is_available(void){
+bool PaymentStatus::is_available(void) const {
 	valkeyReply *reply;
 
 	for(short i = 0; i < MAX_FAILING_KEYS; i++){
@@ -25,7 +25,7 @@ bool PaymentStatus::is_available(void){
 	return true;
 }
 
-int PaymentStatus::get_min_response_time(void){
+int PaymentStatus::get_min_response_time(void) const {
 	valkeyReply *reply = valkeyCommand("HGET %s %s", this->hashkey, PaymentStatus::minResponseTime);
 
 	float minResponseTime = std::strtof(this->reply->str, NULL);
