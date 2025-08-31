@@ -1,13 +1,25 @@
 #include <crow.h>
 #include "Controllers.hpp"
+#include "cache/AvailabilityChecker.hpp"
+#include "CurlEasy.hpp"
 
-static void Controllers::payments(void) const
+crow::response Controllers::payments(crow::request &req) const
 {
-	crow::json::wvalue res({
-		{"message", "Mr. Stomach is not in home."}
-	});
+	crow::response res { 202 };
+	AvailabilityChecker checker;
 
-	res.code = 202;
+	const char *url = checker.get_best_payment_server();
+
+	if(url == NULL)
+	{
+		// TODO: add in the cache queue
+		return res;
+	}
+
+	CurlEasy requester{ url };
+	requester.execute_request( /* TODO: extract JSON from `req` */ );
+
+	// TODO: add operation to the register (cache)
 
 	return res;
 }

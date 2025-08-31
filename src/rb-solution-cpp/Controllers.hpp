@@ -5,6 +5,5 @@
 class Controllers
 {
 public:
-	//static void payment(const crow::request &req) const;
-	static void payments(void) const;
+	static crow::response payment(const crow::request &req) const;
 };
