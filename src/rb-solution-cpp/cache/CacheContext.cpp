@@ -13,7 +13,7 @@ static void CacheContext::start(void)
 		std::exit(EXIT_DB_CONNECT_FAIL);
 }
 
-static valkeyContext* CacheContext::get(void)
+static valkeyContext* CacheContext::get(void) const
 {
 	return CacheContext::context;
 }

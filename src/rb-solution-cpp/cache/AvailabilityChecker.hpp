@@ -4,9 +4,6 @@
 #include <valkey/valkey.h>
 #include "PaymentStatus.hpp"
 
-#define PAYM_DEF_URL_PAY "http://payment-processor-default:8080/payments"
-#define PAYM_FAL_URL_PAY "http://payment-processor-fallback:8080/payments"
-
 class AvailabilityChecker
 {
 private:

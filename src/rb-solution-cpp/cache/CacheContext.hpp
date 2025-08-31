@@ -9,5 +9,5 @@ private:
 
 public:
 	static void start(void);
-	static valkeyContext* get(void);
+	static valkeyContext* get(void) const;
 };

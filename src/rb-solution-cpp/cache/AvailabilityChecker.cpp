@@ -2,6 +2,7 @@
 #include "AvailabilityChecker.hpp"
 #include "PaymentStatus.hpp"
 #include "CacheContext.hpp"
+#include "payment-processors.h"
 
 AvailabilityChecker::AvailabilityChecker(void)
 {
@@ -30,14 +31,14 @@ char* AvailabilityChecker::get_best_payment_server(void) const
 
 
 	if(paymDefDelay != -1 && paymDefDelay <= paymFalDelay)
-		return PAYM_DEF_URL_PAY;
+		return PP_DEF_URL;
 
 	if(paymFalDelay != -1)
-		return PAYM_FAL_URL_PAY;
+		return PP_FAL_URL;
 
 	// fallback delay in lower, but it is inavailable
 	if(paymDefDelay != -1)
-		return PAYM_DEF_URL_PAY;
+		return PP_DEF_URL;
 
 	return NULL;
 }
