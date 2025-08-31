@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 
+#define PP_PORT 8080
+
 #define PP_DEF_URL "https://payment-processor-default:8080"
 #define PP_FAL_URL "https://payment-processor-fallback:8080"
 
