@@ -2,8 +2,6 @@
 
 #include <crow.h>
 
-#define ENDPOINT_PAYMENT "/payments"
-
 class Controllers
 {
 public:

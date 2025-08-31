@@ -3,6 +3,7 @@
 #include <valkey/valkey.h>
 #include "Ctx.hpp"
 #include "cache-aside.h"
+#include "payment-processors.h"
 
 static void Ctx::set_curl_post(void)
 {
@@ -11,9 +12,9 @@ static void Ctx::set_curl_post(void)
 	if(this->_curl_post == NULL)
 		std::exit(EXIT_IMPOSSIBLE_START_CURL);
 
-	this->header_post = curl_slist_append(NULL, HEADER_DATA_POST);
+	this->header_post = curl_slist_append(NULL, CTX_URL_HEADER);
 
-	this->cur_url = PAYM_URL::NONE:
+	this->cur_url = PAYM_URL::NONE;
 	curl_easy_setopt(this->_curl_post, CURLOPT_PORT,       PAYM_POST);
 	curl_easy_setopt(this->_curl_post, CURLOPT_POST,       1L);
 	curl_easy_setopt(this->_curl_post, CURLOPT_HTTPHEADER, this->header_post);
@@ -75,6 +76,6 @@ static void Ctx::set_url_to_curl(PAYM_URL url)
 	this->cur_url = url;
 
 	curl_easy_setopt(this->_curl_post, CURLOPT_URL,
-		(url == PAYM_URL::DEFAULT) ? PAYM_DEF_URL : PAYM_FAL_URL
+		(url == PAYM_URL::DEFAULT) ? PP_DEF_URL : PP_FAL_URL
 	);
 }

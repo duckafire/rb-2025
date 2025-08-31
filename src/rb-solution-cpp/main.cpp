@@ -2,6 +2,7 @@
 #include "Controllers.hpp"
 #include "Ctx.hpp"
 #include "exit-codes.h"
+#include "payment-processors.h"
 
 #define PORT argv[1]
 
@@ -13,7 +14,7 @@ int main(int argc, char *argv[])
 	crow::SimpleApp app;
 	Ctx::start();
 
-	app.router_dynamic( ENDPOINT_PAYMENT )
+	app.router_dynamic( PP_ENDPOINT_PAY )
 		.methods( crow::HTTPMethod::GET )
 		(Controllers::payments);
 

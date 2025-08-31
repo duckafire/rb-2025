@@ -3,11 +3,7 @@
 #include <curl/curl.h>
 #include <valkey/valkey.h>
 
-#define PAYM_PORT "8080"
-#define HEADER_DATA_POST "Content-Type: application/json; charset=ascii"
-
-#define PAYM_DEF_URL "http://payment-processor-default:8080/payments"
-#define PAYM_FAL_URL "http://payment-processor-fallback:8080/payments"
+#define CTX_URL_HEADER "Content-Type: application/json; charset=ascii"
 
 enum PAYM_URL
 {
