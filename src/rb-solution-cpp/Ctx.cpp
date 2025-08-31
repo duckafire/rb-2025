@@ -2,7 +2,7 @@
 #include <curl/curl.h>
 #include <valkey/valkey.h>
 #include "Ctx.hpp"
-#include "db-info.h"
+#include "cache-aside.h"
 
 static void Ctx::set_curl_post(void)
 {
@@ -26,7 +26,7 @@ static void Ctx::set_curl_post(void)
 
 static void Ctx::set_valkey(void)
 {
-	this->_valkey = valkeyConnect(CACHE_DB_HOST, CACHE_DB_PORT);
+	this->_valkey = valkeyConnect(CA_HOST, CA_PORT);
 
 	// if only the second is `true`,
 	// the `cleanup` free `_valkey`

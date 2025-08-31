@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <valkey/valkey.h>
 #include "exit-codes.h"
-#include "db-info.h"
+#include "cache-aside.h"
 #include "cache.h"
 
 static valkeyContext *ctx = NULL;
@@ -30,7 +30,10 @@ void update_cache(const char *hashkey, bool failing, int minResponseTime)
 	// endpoint ("/payment/service-health") delay.
 	reply = valkeyCommand(
 		ctx,
-		"HSET %s failing-after-checking %hi failing %hi minResponseTime %i",
+			"HSET %s "
+			CA_HFIELD_FAILING_AFTER " %hd "
+			CA_HFIELD_FAILING       " %hd "
+			CA_HFIELD_MIN_RES_TIME  " %d",
 		hashkey,
 		0,
 		failing,
@@ -43,7 +46,7 @@ void update_cache(const char *hashkey, bool failing, int minResponseTime)
 
 void connect_cache(const char *hashkey)
 {
-	ctx = valkeyConnect(CACHE_DB_HOST, CACHE_DB_PORT);
+	ctx = valkeyConnect(CA_HOST, CA_PORT);
 	check_connection_error();
 	update_cache(hashkey, false, 0); // avoid "nil"
 }
