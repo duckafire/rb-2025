@@ -1,11 +1,11 @@
 #include <valkey/valkey.h>
 #include "AvailabilityChecker.hpp"
 #include "PaymentStatus.hpp"
-#include "../Ctx.hpp"
+#include "CacheContext.hpp"
 
 AvailabilityChecker::AvailabilityChecker(void)
 {
-	this->context = Ctx::valkey();
+	this->context = CacheContext::get();
 	this->paymDef = new PaymentStatus("paym-def");
 	this->paymFal = new PaymentStatus("paym-fal");
 }

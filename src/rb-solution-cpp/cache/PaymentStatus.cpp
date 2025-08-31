@@ -1,11 +1,11 @@
 #include <cstdlib>
 #include "PaymentStatus.hpp"
-#include "../Ctx.hpp"
+#include "CacheContext.hpp"
 
 PaymentStatus::PaymentStatus(const char *hk):
 		hashkey(hk)
 {
-	this->context = Ctx::valkey;
+	this->context = CacheContext::get();
 }
 
 bool PaymentStatus::is_available(void) const

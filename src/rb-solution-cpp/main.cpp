@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 		return EXIT_NO_PORT_FOR_CPP_SOLUTION;
 
 	crow::SimpleApp app;
-	Ctx::start();
+	CacheContext::start();
 
 	app.router_dynamic( PP_ENDPOINT_PAY )
 		.methods( crow::HTTPMethod::GET )
