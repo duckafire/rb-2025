@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define PP_PORT 8080
 
 #define PP_DEF_URL "https://payment-processor-default:8080"
@@ -11,7 +7,3 @@ extern "C" {
 
 #define PP_ENDPOINT_PAY    "/payments"
 #define PP_ENDPOINT_HEALTH "/payments/service-health"
-
-#ifdef __cplusplus
-}
-#endif

@@ -1,9 +1,8 @@
-#include <stdlib.h>
-#include <stdbool.h>
+#include <cstdlib>
 #include <valkey/valkey.h>
-#include "exit-codes.h"
-#include "cache-aside.h"
-#include "cache.h"
+#include "exit-codes.hpp"
+#include "cache-aside.hpp"
+#include "cache.hpp"
 
 static valkeyContext *ctx = NULL;
 
@@ -12,7 +11,7 @@ static void check_connection_error(void)
 	if(ctx != NULL && ctx->err == 0)
 		return;
 
-	exit(EXIT_DB_CONNECT_FAIL);
+	exit(EXIT::DB_CONNECT_FAIL);
 }
 
 void update_cache(const char *hashkey, bool failing, int minResponseTime)

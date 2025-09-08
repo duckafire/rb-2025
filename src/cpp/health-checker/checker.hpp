@@ -1,7 +1,6 @@
 #pragma once
 
-#include <stddef.h>
-#include <stdbool.h>
+#include <cstddef>
 #include <curl/curl.h>
 
 static void init(void);

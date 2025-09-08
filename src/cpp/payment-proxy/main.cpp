@@ -1,8 +1,8 @@
 #include <crow.h>
 #include "Controllers.hpp"
 #include "Ctx.hpp"
-#include "exit-codes.h"
-#include "payment-processors.h"
+#include "exit-codes.hpp"
+#include "payment-processors.hpp"
 
 #define PORT argv[1]
 

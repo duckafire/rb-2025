@@ -2,7 +2,7 @@
 #include "AvailabilityChecker.hpp"
 #include "PaymentStatus.hpp"
 #include "CacheContext.hpp"
-#include "payment-processors.h"
+#include "payment-processors.hpp"
 
 AvailabilityChecker::AvailabilityChecker(void)
 {

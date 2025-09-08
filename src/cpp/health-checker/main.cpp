@@ -1,10 +1,9 @@
-#include <stdlib.h>
-#include <stdbool.h>
+#include <cstdlib>
 #include <unistd.h>
-#include "exit-codes.h"
-#include "checker.h"
-#include "cache.h"
-#include "response.h"
+#include "exit-codes.hpp"
+#include "checker.hpp"
+#include "cache.hpp"
+#include "response.hpp"
 
 #define HASHKEY argv[1]
 #define URL     argv[2]
@@ -20,8 +19,8 @@ int main(int argc, char *argv[])
 {
 	switch(argc)
 	{
-		case 1: return EXIT_AUX_HASHEY_NOT_SPECIFIED;
-		case 2: return EXIT_AUX_URL_NOT_SPECIFIED;
+		case 1: return EXIT::AUX_HASHEY_NOT_SPECIFIED;
+		case 2: return EXIT::AUX_URL_NOT_SPECIFIED;
 	}
 
 	atexit(cleanup);
@@ -47,5 +46,5 @@ int main(int argc, char *argv[])
 		sleep(5);
 	}
 
-	return EXIT_OK;
+	return EXIT::OK;
 }

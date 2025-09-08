@@ -1,6 +1,6 @@
 #include <valkey/valkey.h>
 #include "CacheContext.hpp"
-#include "cache-aside.h"
+#include "cache-aside.hpp"
 
 static void CacheContext::start(void)
 {

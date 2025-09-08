@@ -1,9 +1,8 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <curl/curl.h>
-#include "exit-codes.h"
-#include "checker.h"
+#include "exit-codes.hpp"
+#include "checker.hpp"
 
 static CURL *ctx = NULL;
 static char *response = NULL;
@@ -14,7 +13,7 @@ static void init(void)
 	ctx = curl_easy_init();
 
 	if(ctx == NULL)
-		exit(EXIT_IMPOSSIBLE_START_CURL);
+		exit(EXIT::IMPOSSIBLE_START_CURL);
 
 	header = curl_slist_append(NULL, "Accept: application/json; charset=ascii");
 }
@@ -65,7 +64,7 @@ char* check_payment_health(const char *url)
 {
 	// response is defined in the `writefunction`
 	if(curl_easy_perform(ctx) != CURLE_OK)
-		exit(EXIT_SOME_CURL_ERROR);
+		exit(EXIT::SOME_CURL_ERROR);
 
 	return response;
 }

@@ -1,13 +1,12 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include "response.h"
+#include <cstdlib>
+#include <cstring>
+#include "response.hpp"
 
 #define MAX_BREAKCHAR 3
 
 static ResponseJSON *response = NULL;
 
-ResponseJSON* extract_json_data(char *data)
+ResponseJSON* extract_json_data(const char *data)
 {
 	short breakchar = 0;
 	bool getFailingField = true;

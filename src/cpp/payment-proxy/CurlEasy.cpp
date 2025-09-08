@@ -1,7 +1,7 @@
 #include <curl/curl.h>
 #include "CurlEasy.hpp"
-#include "exit-codes.h"
-#include "payment-processors.h"
+#include "exit-codes.hpp"
+#include "payment-processors.hpp"
 
 CurlEasy::CurlEasy(const char *url)
 {

@@ -9,7 +9,7 @@ WORKDIR /build
 # sed -i 's/deb\(\.debian\.org\)/archive\1/g' /etc/apt/sources.list
 
 RUN apt update 1> /dev/null \
-	&& apt install -y git gcc cmake 1> /dev/null
+	&& apt install -y git gcc g++ cmake 1> /dev/null
 
 RUN git clone --depth 1 --branch 0.1.0 https://github.com/valkey-io/libvalkey.git 1> /dev/null \
 	&& mkdir ./libvalkey/build \
