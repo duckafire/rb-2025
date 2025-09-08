@@ -18,7 +18,7 @@ x-images-templates:
         #image: debian:buster-20240612-slim
         #build:
             #context: ../..
-            #dockerfile: ./docker/build-files/health-checker.Dockerfile
+            #dockerfile: ./docker/build-files/cpp/health-checker.Dockerfile
         image: duckafire/rb-2025:health-checker_debian-buster_0.0.1
         depends_on:
             - cache-aside
